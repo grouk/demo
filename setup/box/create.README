@@ -1,0 +1,21 @@
+
+wget http://cdimage.debian.org/cdimage/weekly-builds/amd64/iso-cd/debian-testing-amd64-netinst.iso
+
+qemu-img create -f qcow2 opnstkdeb7.img 5G
+
+brctl addbr br0
+ifconfig br0 192.168.10.1/24
+echo 1 > /proc/sys/net/ipv4/ip_forward
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+qemu-system-x86_64 \
+-hda opnstkdeb7.img \
+-cdrom debian-testing-amd64-netinst.iso \
+-boot d -m 1024 \
+-k fr \
+-net nic,macaddr=52:54:00:de:ad:42,model=e1000 \
+-net tap,vlan=0,ifname=tap0,script=qemu-ifup
+
+
+
+
