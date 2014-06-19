@@ -1,0 +1,58 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+   # 'network' node
+   config.vm.define "network" do |network|
+
+          network.vm.box = "debian7.4"
+          network.vm.hostname = "network"
+         
+         # network interfaces
+           # management
+           network.vm.network :private_network, ip: "10.100.1.10"
+           # instance tunnel
+           network.vm.network :private_network, ip: "10.101.1.10"
+           # external
+           network.vm.network :public_network, bridge: 'vmbr0', ip: "192.168.4.10"
+         
+         # configuration
+         
+         network.vm.provision "puppet"
+
+        
+    end
+   
+   # 'controler' node
+   config.vm.define "controler" do |controler|
+
+          controler.vm.box = "debian7.4"
+          controler.vm.hostname = "controler"
+
+          # network interfaces
+           # management 
+           controler.vm.network :private_network, ip: "10.100.1.11"
+
+          # configuration
+       
+          controler.vm.provision "puppet"
+   end
+
+   # 'compute1' node
+   config.vm.define "compute1" do |compute1|
+
+          compute1.vm.box = "debian7.4"
+          compute1.vm.hostname = "controler"
+
+          # network interfaces
+
+           # management 
+           compute1.vm.network :private_network, ip: "10.100.1.12"
+           # instance tunnel
+           compute1.vm.network :private_network, ip: "10.101.1.12"
+
+         # configuration
+          compute1.vm.provision "puppet"
+   end
+   
+end
