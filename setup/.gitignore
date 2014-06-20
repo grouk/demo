@@ -1,0 +1,4 @@
+.vagrant
+./box/debian-testing-amd64-netinst.iso
+./box/opnstkdeb7.img
+

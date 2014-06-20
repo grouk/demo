@@ -14,7 +14,9 @@ qemu-system-x86_64 \
 -boot d -m 1024 \
 -k fr \
 -net nic,macaddr=52:54:00:de:ad:42,model=e1000 \
--net tap,vlan=0,ifname=tap0,script=qemu-ifup
+-net tap,vlan=0,ifname=tap0,script=qemu-ifup \
+-vnc :1 \
+-daemonize
 
 
 
