@@ -1,23 +1,44 @@
 
+# download debian netinst iso
 wget http://cdimage.debian.org/cdimage/weekly-builds/amd64/iso-cd/debian-testing-amd64-netinst.iso
 
-qemu-img create -f qcow2 opnstkdeb7.img 5G
+# create base img
+qemu-img create -f qcow2 opnstkdeb7.img 15G
 
+# configure vswitch
 brctl addbr br0
 ifconfig br0 192.168.10.1/24
+/etc/init.d/isc-dhcp-server start # on br0, subnet 192.168.10.0/24
+
+# enable internet access (NAT)
+/etc/init.d/dnsmasq start         # listen on br0
 echo 1 > /proc/sys/net/ipv4/ip_forward
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
+# boot vm 
 qemu-system-x86_64 \
+-enable-kvm  \
+-smp sockets=1,cores=1 \
+-boot d \
+-vga std \
+-k fr \
+-m 1024 \
 -hda opnstkdeb7.img \
 -cdrom debian-testing-amd64-netinst.iso \
--boot d -m 1024 \
+-netdev type=tap,id=net0,ifname=tap0,script=qemu-ifup \
+-device e1000,mac=D2:EB:15:BA:7C:4A,netdev=net0,bus=pci.0,addr=0x12,id=net0,bootindex=300 \
+-vnc  :1 
+
+# connect with vncviewer
+
+qemu-system-x86_64 \
+-enable-kvm  \
+-smp sockets=1,cores=1 \
+-boot d \
+-vga std \
 -k fr \
--net nic,macaddr=52:54:00:de:ad:42,model=e1000 \
--net tap,vlan=0,ifname=tap0,script=qemu-ifup \
--vnc :1 \
--daemonize
-
-
-
-
+-m 1024 \
+-hda opnstkdeb7.img \
+-netdev type=tap,id=net0,ifname=tap0,script=qemu-ifup \
+-device e1000,mac=D2:EB:15:BA:7C:4A,netdev=net0,bus=pci.0,addr=0x12,id=net0,bootindex=300 \
+-vnc  :1 
