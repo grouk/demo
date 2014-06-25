@@ -1,27 +1,40 @@
 VAGRANTFILE_API_VERSION = "2"
+#Vagrant.require_plugin "vagrant-libvirt"
+
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
+   config.ssh.username = "vagrant"
+   config.ssh.password = "vagrant"
    # -----------------------------------------------------#
    # 'network' node
    # -----------------------------------------------------#
+
+   config.vm.synced_folder ".", "/vagrant", disabled: true
+ 
    config.vm.define "network" do |network|
 
-          network.vm.box = "debian7.4"
+          network.vm.box = "deb-testing"
           network.vm.hostname = "network"
+         
+          network.vm.provider :libvirt do |domain|
+            domain.memory = 512
+          end
          
          # network interfaces
            # management
-           network.vm.network :private_network, ip: "10.100.1.10"
+           network.vm.network :private_network, ip: "10.0.0.21", :libvirt__network_name => 'management'
            # instance tunnel
-           network.vm.network :private_network, ip: "10.101.1.10"
+           network.vm.network :private_network, ip: "10.0.1.21", :libvirt__network_name => 'tunnels' 
            # external
-           network.vm.network :public_network, bridge: 'vmbr0', ip: "192.168.4.10"
+           network.vm.network :public_network , :dev => 'eth1' 
          
          # configuration
           
+         network.vm.provision :shell , inline: 'echo "nameserver 192.168.121.1"> /etc/resolv.conf'
          # install puppet
          network.vm.provision :shell , path: "provision/shell/enable-puppet.sh"
+         network.vm.provision :shell , path: "provision/shell/update-hosts"
          
          network.vm.provision "puppet"
 
@@ -33,17 +46,22 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    # -----------------------------------------------------#
    config.vm.define "controler" do |controler|
 
-          controler.vm.box = "debian7.4"
+          controler.vm.box = "deb-testing"
           controler.vm.hostname = "controler"
+          controler.vm.provider :libvirt do |domain|
+            domain.memory = 2048
+          end
 
           # network interfaces
            # management 
-           controler.vm.network :private_network, ip: "10.100.1.11"
+           controler.vm.network :private_network, ip: "10.0.0.11", :libvirt__network_name => 'management'
 
           # configuration
        
          # install puppet
+          controler.vm.provision :shell , inline: "echo 'nameserver 192.168.121.1'> /etc/resolv.conf"
           controler.vm.provision :shell , path: "provision/shell/enable-puppet.sh"
+          controler.vm.provision :shell , path: "provision/shell/update-hosts"
           controler.vm.provision "puppet"
    end
 
@@ -52,19 +70,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    # -----------------------------------------------------#
    config.vm.define "compute1" do |compute1|
 
-          compute1.vm.box = "debian7.4"
+          compute1.vm.box = "deb-testing"
           compute1.vm.hostname = "compute1"
+          compute1.vm.provider :libvirt do |domain|
+            domain.memory = 2048
+          end
 
           # network interfaces
 
            # management 
-           compute1.vm.network :private_network, ip: "10.100.1.12"
+           compute1.vm.network :private_network, ip: "10.0.0.31", :libvirt__network_name => 'management'
            # instance tunnel
-           compute1.vm.network :private_network, ip: "10.101.1.12"
+           compute1.vm.network :private_network, ip: "10.0.1.31", :libvirt__network_name => 'tunnels'
 
          # configuration
          # install puppet
+          compute1.vm.provision :shell , inline: "echo 'nameserver 192.168.121.1'> /etc/resolv.conf"
           compute1.vm.provision :shell , path: "provision/shell/enable-puppet.sh"
+          compute1.vm.provision :shell , path: "provision/shell/update-hosts"
           compute1.vm.provision "puppet"
    end
    
