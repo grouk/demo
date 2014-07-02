@@ -1,9 +1,9 @@
 node 'controller' {
-include ::openstack::role::controller
+#include ::openstack::role::controller
 }
 node 'network' {
-include ::openstack::role::network
+#include ::openstack::role::network
 }
 node 'compute1' {
-include ::openstack::role::compute
+#include ::openstack::role::compute
 }

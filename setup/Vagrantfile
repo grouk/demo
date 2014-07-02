@@ -26,10 +26,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           # configuration
        
          # install puppet
-          controller.vm.provision :shell , inline: "echo 'nameserver 192.168.4.1'> /etc/resolv.conf"
+          controller.vm.provision :shell , inline: "echo 'nameserver 10.0.0.1'> /etc/resolv.conf"
           controller.vm.provision "shell", inline: "hostname controller.demo && hostname > /etc/hostname"
           controller.vm.provision :shell , path: "provision/shell/enable-puppet.sh"
-          controller.vm.provision :shell , path: "provision/shell/update-hosts"
           controller.vm.provision :shell , path: "provision/shell/install-puppet-openstack"
         
           controller.vm.provision :file do |file|
@@ -39,6 +38,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           controller.vm.provision :file do |file|
             file.source      = 'provision/file/etc/puppet/hieradb/common.yaml'
             file.destination = '/etc/puppet/hieradb/common.yaml'
+          end
+          controller.vm.provision :file do |file|
+            file.source      = 'provision/file/etc/hosts'
+            file.destination = '/etc/hosts'
           end
           controller.vm.provision 'puppet' do |puppet|
            puppet.manifests_path = 'provision/puppet/manifests'
@@ -74,7 +77,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
          
          # configuration
           
-         network.vm.provision :shell , inline: 'echo "nameserver 192.168.4.1"> /etc/resolv.conf'
+         network.vm.provision :shell , inline: 'echo "nameserver 10.0.0.1"> /etc/resolv.conf'
          network.vm.provision "shell", inline: "hostname network.demo && hostname > /etc/hostname"
          # install puppet
          network.vm.provision :shell , path: "provision/shell/enable-puppet.sh"
@@ -87,6 +90,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
          network.vm.provision :file do |file|
             file.source      = 'provision/file/etc/puppet/hieradb/common.yaml'
             file.destination = '/etc/puppet/hieradb/common.yaml'
+         end
+         network.vm.provision :file do |file|
+            file.source      = 'provision/file/etc/hosts'
+            file.destination = '/etc/hosts'
          end
 
          network.vm.provision 'puppet' do |puppet|
@@ -118,10 +125,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
          # configuration
          # install puppet
-          compute1.vm.provision :shell , inline: "echo 'nameserver 192.168.4.1'> /etc/resolv.conf"
+          compute1.vm.provision :shell , inline: "echo 'nameserver 10.0.0.1'> /etc/resolv.conf"
           compute1.vm.provision "shell", inline: "hostname compute1.demo && hostname > /etc/hostname"
           compute1.vm.provision :shell , path: "provision/shell/enable-puppet.sh"
-          compute1.vm.provision :shell , path: "provision/shell/update-hosts"
           compute1.vm.provision :shell , path: "provision/shell/install-puppet-openstack"
           compute1.vm.provision :file do |file|
             file.source      = 'provision/file/etc/puppet/hiera.yaml'
@@ -130,6 +136,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           compute1.vm.provision :file do |file|
             file.source      = 'provision/file/etc/puppet/hieradb/common.yaml'
             file.destination = '/etc/puppet/hieradb/common.yaml'
+          end
+          compute1.vm.provision :file do |file|
+            file.source      = 'provision/file/etc/hosts'
+            file.destination = '/etc/hosts'
           end
           compute1.vm.provision 'puppet' do |puppet|
            puppet.manifests_path = 'provision/puppet/manifests'

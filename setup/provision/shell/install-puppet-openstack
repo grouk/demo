@@ -1,4 +1,0 @@
-apt-get update
-apt-get upgrade -y
-puppet module install puppetlabs-openstack
-mkdir -p /etc/puppet/hieradb

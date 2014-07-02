@@ -1,0 +1,5 @@
+127.0.0.1 localhost     localhost.localdomain
+10.0.0.21 network       network.demo
+10.0.0.11 controller    controller.demo
+10.0.0.31 compute1      compute1.demo
+
